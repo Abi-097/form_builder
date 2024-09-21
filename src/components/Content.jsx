@@ -54,7 +54,7 @@ const DraggableBox = ({ id, text, index, moveBox, onClick }) => {
     </div>
   );
 };
-const Content = () => {
+const Content = ({ onWelcomeDataChange, welcomeData }) => {
   const [boxes, setBoxes] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -117,14 +117,24 @@ const Content = () => {
       </DndProvider>
       <Drawer
         open={drawerOpen}
-        onClose={toggleDrawer}
+        // onClose={toggleDrawer}
+        onClose={() => {}}
         className="p-6"
         size={320}
       >
-        <Typography variant="h5" color="blue-gray">
-          Settings
-        </Typography>
-        {activeComponent === "Welcome" && <Welcome />}
+        <div className="flex items-center justify-between">
+          <Typography variant="h5" color="blue-gray">
+            Settings
+          </Typography>
+          <X size={18} onClick={toggleDrawer} className="cursor-pointer" />
+        </div>
+        {activeComponent === "Welcome" && (
+          <Welcome
+            onSave={toggleDrawer}
+            onDataChange={onWelcomeDataChange}
+            welcomeData={welcomeData}
+          />
+        )}
 
         {activeComponent === "Email" && <Email />}
 

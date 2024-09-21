@@ -1,20 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input, Button } from "@material-tailwind/react";
 
-const Welcome = ({ onSave }) => {
-  const [uploadedImage, setUploadedImage] = useState(null);
+const Welcome = ({ onSave, onDataChange, welcomeData }) => {
+  // const [uploadedImage, setUploadedImage] = useState(welcomeData.image || "");
+  // const [title, setTitle] = useState(welcomeData.title || "");
+  // const [description, setDescription] = useState(welcomeData.description || "");
+  // const [buttonText, setButtonText] = useState(welcomeData.buttonText || "");
+
+  const [localData, setLocalData] = useState({ ...welcomeData });
+
+  // Synchronize local state with global state
+  useEffect(() => {
+    setLocalData(welcomeData);
+  }, [welcomeData]);
+
+  // Function to handle changes
+  const handleChange = (field, value) => {
+    const updatedData = { ...localData, [field]: value };
+    setLocalData(updatedData);
+    onDataChange(updatedData); // Update the main welcomeData
+  };
 
   const handleUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        setUploadedImage(reader.result); // Set the uploaded image as base64 string
+        handleChange("image", reader.result); // Set the uploaded image as base64 string
       };
       reader.readAsDataURL(file); // Read file as Data URL
     }
   };
-
   // Function to trigger the file input
   const triggerFileInput = () => {
     document.getElementById("image-upload").click(); // Trigger file input click
@@ -22,13 +38,28 @@ const Welcome = ({ onSave }) => {
   return (
     <div>
       <div className="my-4">
-        <Input label="Title" className="mb-4" />
+        <Input
+          label="Title"
+          className="mb-4"
+          value={localData.title || ""}
+          onChange={(e) => handleChange("title", e.target.value)}
+        />
       </div>
       <div className="mb-4">
-        <Input label="Description" className="mb-4" />
+        <Input
+          label="Description"
+          className="mb-4"
+          value={localData.description || ""}
+          onChange={(e) => handleChange("description", e.target.value)}
+        />
       </div>
       <div className="mb-4">
-        <Input label="Button Text" className="mb-4" />
+        <Input
+          label="Button Text"
+          className="mb-4"
+          value={localData.buttonText || ""}
+          onChange={(e) => handleChange("buttonText", e.target.value)}
+        />
       </div>
 
       <div className="mb-4">
@@ -45,10 +76,10 @@ const Welcome = ({ onSave }) => {
       </div>
 
       {/* Show the uploaded image preview */}
-      {uploadedImage && (
+      {localData.image && (
         <div className="mb-4">
           <img
-            src={uploadedImage}
+            src={localData.image}
             alt="Uploaded"
             className="w-full h-32 object-cover rounded-md"
           />

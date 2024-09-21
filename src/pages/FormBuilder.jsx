@@ -11,6 +11,7 @@ import {
 } from "@material-tailwind/react";
 import Content from "../components/Content";
 import { useParams } from "react-router-dom";
+import { useState } from "react";
 
 const data = [
   {
@@ -18,31 +19,29 @@ const data = [
     value: "content",
     component: <Content />,
   },
-  {
-    label: "Design",
-    value: "design",
-    component: `Because it's about motivating the doers. Because I'm here
-          to follow my dreams and inspire other people to follow their dreams, too.`,
-  },
-
-  {
-    label: "Share",
-    value: "share",
-    component: `We're not always in the position that we want to be at.
-          We're constantly growing. We're constantly making mistakes. We're
-          constantly trying to express ourselves and actualize our dreams.`,
-  },
-
-  {
-    label: "Replies",
-    value: "replies",
-    component: `Because it's about motivating the doers. Because I'm here
-          to follow my dreams and inspire other people to follow their dreams, too.`,
-  },
 ];
 
 const FormBuilder = () => {
+  const [welcomeData, setWelcomeData] = useState({
+    title: "",
+    description: "",
+    buttonText: "",
+    image: null,
+  });
   const { formName } = useParams();
+
+  // Handler for changes to welcomeData
+  const handleWelcomeDataChange = (data) => {
+    setWelcomeData(data); // Keep the single source of truth
+  };
+
+  // Function to handle input change from the right side
+  const handleInputChange = (field, value) => {
+    setWelcomeData((prevData) => ({
+      ...prevData,
+      [field]: value,
+    }));
+  };
   return (
     <div className="flex h-screen">
       {/* Left side*/}
@@ -72,7 +71,14 @@ const FormBuilder = () => {
           >
             {data.map(({ value, component }) => (
               <TabPanel key={value} value={value} className="p-0">
-                {component}
+                {value === "content" ? (
+                  <Content
+                    onWelcomeDataChange={handleWelcomeDataChange}
+                    welcomeData={welcomeData}
+                  />
+                ) : (
+                  component
+                )}
               </TabPanel>
             ))}
           </TabsBody>
@@ -80,11 +86,42 @@ const FormBuilder = () => {
         <Button>Button</Button>
       </div>
 
-      {/* Right side: 85% width with shadow and rounded corners */}
+      {/* Right side*/}
       <div className="flex-1 bg-darkbg p-8 rounded-xl m-2 shadow-lg">
-        {/* Content for the right side */}
-        <h2 className="text-2xl font-semibold">Form Builder</h2>
-        <p>This is where the form will be built.</p>
+        <h2 className="text-xl font-bold mb-4">
+          <input
+            type="text"
+            value={welcomeData.title || ""}
+            onChange={(e) => handleInputChange("title", e.target.value)}
+            className="border border-gray-300 rounded p-2 w-full"
+          />
+        </h2>
+
+        <p className="text-gray-600 mb-4">
+          <textarea
+            value={welcomeData.description || ""}
+            onChange={(e) => handleInputChange("description", e.target.value)}
+            className="border border-gray-300 rounded p-2 w-full"
+          />
+        </p>
+        <Button>
+          <input
+            type="text"
+            value={welcomeData.buttonText || ""}
+            onChange={(e) => handleInputChange("buttonText", e.target.value)}
+            className="border border-gray-300 rounded p-2 text-black"
+          />
+        </Button>
+        {/* Show the uploaded image */}
+        {welcomeData.image && (
+          <div className="mt-4">
+            <img
+              src={welcomeData.image}
+              alt="Uploaded"
+              className="w-full h-32 object-cover rounded-md"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
