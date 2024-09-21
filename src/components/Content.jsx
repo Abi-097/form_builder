@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { Dot, X, GripVertical } from "lucide-react";
+import { X, GripVertical, Menu, Plus, Mail } from "lucide-react";
 import {
   Card,
   Button,
@@ -42,19 +42,26 @@ const DraggableBox = ({ id, text, index, moveBox, onClick }) => {
   return (
     <div
       ref={(node) => drag(drop(node))}
-      onClick={onClick} // Attach onClick handler to open the drawer with respective component
+      onClick={onClick}
       className={`flex items-center justify-around bg-gray-100 p-2 rounded-md w-full my-4 pl-3 hover:bg-gray-300 ${
         isDragging ? "opacity-50" : "opacity-100"
       }`}
       style={{ cursor: "pointer" }}
     >
-      <GripVertical size={20} />
+      <GripVertical size={15} />
       <p className="w-full text-center text-xs">{text}</p>
-      <X size={24} />
+      <X size={10} />
     </div>
   );
 };
-const Content = ({ onWelcomeDataChange, welcomeData }) => {
+const Content = ({
+  onWelcomeDataChange,
+  onEmailDataChange,
+  welcomeData,
+  emailData,
+  onAlignmentChange,
+  onComponentSelect,
+}) => {
   const [boxes, setBoxes] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -71,35 +78,39 @@ const Content = ({ onWelcomeDataChange, welcomeData }) => {
   const toggleDrawer = () => setDrawerOpen(!drawerOpen);
   const toggleDialog = () => setDialogOpen(!dialogOpen);
 
-  // Add new draggable box based on type
   const addDraggableBox = (type) => {
     const newBox = {
       id: boxes.length + 1,
       text: type,
-      component: type, // Store component type
+      component: type,
     };
     setBoxes([...boxes, newBox]);
-    toggleDialog(); // Close the dialog after adding
+    toggleDialog();
   };
 
-  // Function to open drawer with the respective component
   const openComponent = (component) => {
-    setActiveComponent(component); // Set active component to display in the drawer
+    setActiveComponent(component);
+    onComponentSelect(component);
     toggleDrawer();
   };
   return (
     <>
+      <div className="flex items-center gap-2 mt-4">
+        <Menu size={13} />{" "}
+        <p className="text-[13px] text-black font-semibold">Steps</p>
+      </div>
+      <p className="text-xs mt-2 mb-4">
+        The steps users will take to complete the form
+      </p>
       <DndProvider backend={HTML5Backend}>
         <Card
           onClick={() => openComponent("Welcome")}
           className="relative flex items-center bg-gray-100 p-3 rounded-md my-4 hover:bg-gray-300 cursor-pointer"
         >
-          <Dot size={24} className="absolute" />
           <p className="w-full text-center text-xs">Welcome Screen</p>
         </Card>
 
         {/* Draggable Boxes */}
-
         {boxes.map((box, index) => (
           <DraggableBox
             key={box.id}
@@ -111,9 +122,21 @@ const Content = ({ onWelcomeDataChange, welcomeData }) => {
             onClick={() => openComponent(box.component)}
           />
         ))}
-        <Button className="mt-4" onClick={toggleDialog}>
-          Add Field
+        <Button
+          className="mt-4 border border-gray-500 bg-transparent text-black p-1 px-2"
+          onClick={toggleDialog}
+          style={{ textTransform: "none" }}
+        >
+          <span className="flex items-center gap-2">
+            <Plus size={12} /> <span className="text-xs">Add Field</span>
+          </span>
         </Button>
+        <Card
+          onClick={() => openComponent("End")}
+          className="relative flex items-center bg-gray-100 p-3 rounded-md my-4 hover:bg-gray-300 cursor-pointer"
+        >
+          <p className="w-full text-center text-xs">End Screen</p>
+        </Card>
       </DndProvider>
       <Drawer
         open={drawerOpen}
@@ -133,23 +156,34 @@ const Content = ({ onWelcomeDataChange, welcomeData }) => {
             onSave={toggleDrawer}
             onDataChange={onWelcomeDataChange}
             welcomeData={welcomeData}
+            onAlignmentChange={onAlignmentChange}
           />
         )}
 
-        {activeComponent === "Email" && <Email />}
+        {activeComponent === "Email" && (
+          <Email
+            onSave={toggleDrawer}
+            onDataChange={onEmailDataChange}
+            emailData={emailData}
+          />
+        )}
 
         {activeComponent === "Name" && <Name />}
       </Drawer>
       {/* Dialog for selecting draggable box type */}
       <Dialog open={dialogOpen} handler={toggleDialog}>
         <DialogBody>
-          <p className="text-sm">Choose the field to add:</p>
-          <div className="flex justify-around mt-4">
-            <Button onClick={() => addDraggableBox("Name")} variant="outlined">
+          <p className="text-lg text-black font-semibold">Add field</p>
+          <div className="flex justify-left mt-4">
+            {/* <Button onClick={() => addDraggableBox("Name")} variant="outlined">
               Name
-            </Button>
-            <Button onClick={() => addDraggableBox("Email")} variant="outlined">
-              Email
+            </Button> */}
+            <Button
+              onClick={() => addDraggableBox("Email")}
+              variant="outlined"
+              className="flex items-center justify-center gap-2 border-none"
+            >
+              <Mail size={14} /> <p className="text-sm">Email</p>
             </Button>
           </div>
         </DialogBody>

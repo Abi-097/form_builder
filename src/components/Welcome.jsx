@@ -1,12 +1,8 @@
 import { useEffect, useState } from "react";
 import { Input, Button } from "@material-tailwind/react";
+import { AlignLeft, AlignRight, Upload } from "lucide-react";
 
-const Welcome = ({ onSave, onDataChange, welcomeData }) => {
-  // const [uploadedImage, setUploadedImage] = useState(welcomeData.image || "");
-  // const [title, setTitle] = useState(welcomeData.title || "");
-  // const [description, setDescription] = useState(welcomeData.description || "");
-  // const [buttonText, setButtonText] = useState(welcomeData.buttonText || "");
-
+const Welcome = ({ onSave, onDataChange, welcomeData, onAlignmentChange }) => {
   const [localData, setLocalData] = useState({ ...welcomeData });
 
   // Synchronize local state with global state
@@ -18,7 +14,7 @@ const Welcome = ({ onSave, onDataChange, welcomeData }) => {
   const handleChange = (field, value) => {
     const updatedData = { ...localData, [field]: value };
     setLocalData(updatedData);
-    onDataChange(updatedData); // Update the main welcomeData
+    onDataChange(updatedData);
   };
 
   const handleUpload = (e) => {
@@ -26,14 +22,18 @@ const Welcome = ({ onSave, onDataChange, welcomeData }) => {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        handleChange("image", reader.result); // Set the uploaded image as base64 string
+        handleChange("image", reader.result);
       };
-      reader.readAsDataURL(file); // Read file as Data URL
+      reader.readAsDataURL(file);
     }
   };
   // Function to trigger the file input
   const triggerFileInput = () => {
-    document.getElementById("image-upload").click(); // Trigger file input click
+    document.getElementById("image-upload").click();
+  };
+  // Function to remove the uploaded image
+  const handleRemoveImage = () => {
+    handleChange("image", null);
   };
   return (
     <div>
@@ -63,8 +63,13 @@ const Welcome = ({ onSave, onDataChange, welcomeData }) => {
       </div>
 
       <div className="mb-4">
-        <Button variant="outlined" className="mb-4" onClick={triggerFileInput}>
-          Upload Image
+        <Button
+          variant="outlined"
+          className="mb-4 flex items-center gap-2 p-2"
+          onClick={triggerFileInput}
+          style={{ textTransform: "none" }}
+        >
+          <Upload size={12} /> <span className="text-xs">Upload Image</span>
         </Button>
         <input
           id="image-upload"
@@ -75,7 +80,6 @@ const Welcome = ({ onSave, onDataChange, welcomeData }) => {
         />
       </div>
 
-      {/* Show the uploaded image preview */}
       {localData.image && (
         <div className="mb-4">
           <img
@@ -83,11 +87,52 @@ const Welcome = ({ onSave, onDataChange, welcomeData }) => {
             alt="Uploaded"
             className="w-full h-32 object-cover rounded-md"
           />
+          <div className="flex items-center justify-center">
+            <Button
+              onClick={handleRemoveImage}
+              variant="outlined"
+              size="sm"
+              className="mt-2 p-2"
+              style={{ textTransform: "none" }}
+            >
+              Remove Image
+            </Button>
+          </div>{" "}
         </div>
       )}
-      <Button onClick={onSave} className="w-full">
-        Save
-      </Button>
+      {/* Alignment buttons */}
+      <div className="flex justify-around mb-4">
+        <p className="my-auto text-sm text-black font-semibold">Placement</p>
+        <Button
+          onClick={() => onAlignmentChange("left")}
+          variant="outlined"
+          className="p-3"
+        >
+          <AlignLeft size={12} />
+        </Button>
+        <Button
+          onClick={() => onAlignmentChange("right")}
+          variant="outlined"
+          className="p-3"
+        >
+          <AlignRight size={12} />
+        </Button>
+      </div>
+      <div className="flex items-center justify-center w-full gap-2">
+        <Button
+          onClick={onSave}
+          className="w-full gap-2 p-3"
+          style={{ textTransform: "none" }}
+        >
+          Save
+        </Button>
+        <Button
+          className="w-full bg-transparent hover:bg-red-100 gap-2 p-3 text-red-500"
+          style={{ textTransform: "none" }}
+        >
+          Discard
+        </Button>
+      </div>
     </div>
   );
 };

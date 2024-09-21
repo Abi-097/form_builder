@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Plus, Search } from "lucide-react";
 import twoStars from "../assets/Images";
 import {
   Button,
@@ -24,45 +24,55 @@ const Dashboard = () => {
 
   const handleCreateForm = () => {
     if (formName.trim()) {
-      setForms([...forms, formName]); // Add the new form to the list of forms
-      setFormName(""); // Clear the input field
-      setOpen(false); // Close the dialog
+      setForms([...forms, formName]);
+      setFormName("");
+      setOpen(false);
       navigate(`/form-builder/${formName}`);
     }
   };
 
   const handleCardClick = (formName) => {
-    navigate(`/form-builder/${formName}`); // Navigate to FormBuilder when card is clicked
+    navigate(`/form-builder/${formName}`);
   };
 
   return (
     <div className="flex h-screen">
       {/* Left side */}
-      <div className="w-full max-w-[320px] bg-white p-4">hello</div>
+      <div className="w-full max-w-[320px] bg-white p-4">
+        <div className="w-72">
+          <Input label="Search" icon={<Search size={14} />} />
+        </div>
+      </div>
 
       {/* Right side */}
       <div className="flex-1 bg-white p-8 rounded-xl m-2 shadow-xl border">
-        {/* Header with emoji and button */}
         <div className="flex justify-between items-center mb-8 lg:mb-0">
           <h1 className="text-2xl font-semibold flex items-center gap-2">
             Hey Buddy <span className="waving-hand">👋</span>
           </h1>
-          {/* Button for lg and xl on same row, for smaller screens it will move */}
-          <button className="hidden lg:block px-4 py-2 bg-blue-500 text-white rounded-lg">
-            Small Button
+
+          <button
+            className="hidden lg:block px-4 py-2  text-white rounded-lg  bg-black"
+            onClick={() => handleOpen()}
+          >
+            <span className="flex items-center justify-center text-sm gap-2">
+              <Plus size={14} /> New Form
+            </span>
           </button>
         </div>
 
         <p className="text-lg font-semibold mb-4">My Forms</p>
 
-        {/* Button under "My Forms" for md, sm, and xs */}
-        <button className="block w-full lg:hidden mb-4 px-4 py-2 bg-blue-500 text-white rounded-lg">
-          Small Button
+        <button
+          className="block w-full lg:hidden mb-4 px-4 py-2 bg-blue-500 text-white rounded-lg"
+          onClick={() => handleOpen()}
+        >
+          <span className="flex items-center justify-center text-sm gap-2">
+            <Plus size={14} /> New Form
+          </span>
         </button>
 
-        {/* Boxes layout */}
         <div className="flex flex-wrap lg:flex-nowrap gap-3 h-[14rem]">
-          {/* First bigger box */}
           <div className="w-full sm:w-full md:w-full lg:w-[65%] xl:w-[65%] p-6 rounded-lg border shadow-md h-[14rem]">
             <p className="text-[#71717a] text-lg">Form replies 0</p>
           </div>
@@ -104,9 +114,9 @@ const Dashboard = () => {
               <Typography
                 variant="h5"
                 color="blue-gray"
-                className="mb-2 text-center text-sm"
+                className="mb-2 text-center text-sm flex items-center gap-2"
               >
-                Create a form
+                <Plus size={14} /> Create a form
               </Typography>
             </CardBody>
           </Card>
